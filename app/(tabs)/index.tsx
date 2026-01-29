@@ -1,98 +1,83 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, FlatList, Text } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { Colors } from "../../src/constants/colors";
+import { Spacing, BorderRadius } from "../../src/constants/spacing";
+import { Typography } from "../../src/constants/fonts";
+import LuxuryHeader from "../../src/components/LuxuryHeader";
+import SearchBar from "../../src/components/SearchBar";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import CategoryChip from "../../src/components/CategoryChip";
+import FeaturedSection from "../../src/components/FeaturedSection";
+import SkeletonLoader from "../../src/components/SkeletonLoader";
+import { useMenuItems, useCategories } from "../../src/hooks/useMenu";
+import { Category } from "../../src/services/types";
+import { useState } from "react";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { items, loading } = useMenuItems();
+  const { categories, loading: categoriesLoading } = useCategories();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const filteredItems = selectedCategory
+    ? items.filter((item) => item.category === selectedCategory)
+    : items;
+
+  const renderCategory = ({ item, index }: { item: Category; index: number }) => (
+    <CategoryChip
+      item={item}
+      isSelected={selectedCategory === item.name}
+      onPress={() =>
+        setSelectedCategory(selectedCategory === item.name ? null : item.name)
+      }
+      delay={index * 50}
+    />
+  );
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        style={styles.scrollView}
+      >
+        <LuxuryHeader />
+        <SearchBar />
+
+
+        {/* Popular Items */}
+        {loading ? (
+          <View style={styles.itemsSection}>
+            <SkeletonLoader width="100%" height={200} borderRadius={BorderRadius.lg} />
+          </View>
+        ) : (
+          <FeaturedSection items={filteredItems} enableNavigation={true} />
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  scrollView: {
+    flex: 1,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  categoriesSection: {
+    marginBottom: Spacing.lg,
+  },
+  categoriesContent: {
+    paddingHorizontal: Spacing.lg - Spacing.md,
+  },
+  skeletonRow: {
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.md,
+    flexDirection: "row",
+  },
+  itemsSection: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.xl,
   },
 });
