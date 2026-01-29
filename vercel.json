@@ -1,13 +1,17 @@
 {
   "buildCommand": "expo export --platform web",
   "outputDirectory": "dist",
+  "framework": "other",
   "installCommand": "npm install",
-  "env": {
-    "NODE_ENV": "production"
+  "functions": {
+    "api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
   },
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/((?!api).*)",
       "destination": "/index.html"
     }
   ]

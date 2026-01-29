@@ -68,7 +68,7 @@ export default function FeaturedCard({ item, onPress, delay = 0, enableNavigatio
               <Text style={styles.emoji}>☕</Text>
             )}
           </View>
-          {item.discount > 0 && (
+          {(item.discount ?? 0) > 0 && (
             <View style={styles.discountTag}>
               <Text style={styles.discountText}>{item.discount}%</Text>
               <Text style={[Typography.caption, { color: Colors.textPrimary }]}>
