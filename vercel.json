@@ -1,7 +1,6 @@
 {
   "buildCommand": "expo export --platform web",
   "outputDirectory": "dist",
-  "framework": "other",
   "installCommand": "npm install",
   "functions": {
     "api/**/*.ts": {
