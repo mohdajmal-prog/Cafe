@@ -108,7 +108,7 @@ export default function RegisterScreen() {
           <View
             style={[
               styles.stepIndicator,
-              (step === "otp" || step === "details") ? styles.stepActive : (step === "details" ? styles.stepComplete : undefined),
+              step === "details" ? styles.stepComplete : step === "otp" ? styles.stepActive : undefined,
             ]}
           >
             <Text style={styles.stepNumber}>2</Text>

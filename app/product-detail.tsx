@@ -121,7 +121,7 @@ export default function ProductDetailScreen() {
               <Text style={styles.imagePlaceholder}>☕</Text>
             )}
           </View>
-          {product.discount > 0 && (
+          {(product.discount ?? 0) > 0 && (
             <View style={styles.discountBadge}>
               <Text style={styles.discountText}>{product.discount}% OFF</Text>
             </View>
@@ -147,9 +147,9 @@ export default function ProductDetailScreen() {
             </View>
             <View style={styles.priceTag}>
               <Text style={[Typography.h3, { color: Colors.primary }]}>₹{product.price}</Text>
-              {product.discount > 0 && (
+              {(product.discount ?? 0) > 0 && (
                 <Text style={[Typography.caption, { color: Colors.textSecondary, textDecorationLine: "line-through" }]}>
-                  ₹{Math.round(product.price / (1 - product.discount / 100))}
+                  ₹{Math.round(product.price / (1 - (product.discount ?? 0) / 100))}
                 </Text>
               )}
             </View>
