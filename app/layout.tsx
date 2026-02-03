@@ -9,7 +9,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Cafe - College Campus Food Ordering",
+  title: "Cafe - Campus Food Ordering",
   description: "Order delicious food and beverages from your campus cafe. Quick delivery, amazing taste!",
 }
 
