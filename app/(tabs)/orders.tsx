@@ -16,9 +16,12 @@ import { Typography } from "../../src/constants/fonts";
 import PremiumCard from "../../src/components/PremiumCard";
 import PremiumButton from "../../src/components/PremiumButton";
 import { useOrders } from "../../src/hooks/useOrders";
+import { useUser } from "../../src/store/UserContext";
 
 export default function OrdersScreen() {
-  const { orders, loading } = useOrders();
+  const { user } = useUser();
+  const userId = user?.phone || user?.id || "guest";
+  const { orders, loading } = useOrders(userId);
   const [selectedTab, setSelectedTab] = useState<"active" | "past">("active");
   const [selectedOrderForQR, setSelectedOrderForQR] = useState<string | null>(null);
 

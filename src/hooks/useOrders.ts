@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { orderService } from "../services/orderService";
 import { Order } from "../services/types";
 
-export function useOrders() {
+export function useOrders(userId?: string) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +13,7 @@ export function useOrders() {
     const fetchOrders = async () => {
       try {
         if (mounted) setLoading(true);
-        const data = await orderService.getOrders();
+        const data = await orderService.getOrders(userId);
         if (mounted) setOrders(data);
       } catch (err) {
         if (mounted) setError(err instanceof Error ? err.message : "An error occurred");
@@ -34,7 +34,7 @@ export function useOrders() {
       mounted = false;
       clearInterval(interval);
     };
-  }, []);
+  }, [userId]);
 
   return { orders, loading, error };
 }

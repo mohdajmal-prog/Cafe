@@ -18,6 +18,7 @@ import { Typography } from "../../src/constants/fonts";
 import PremiumCard from "../../src/components/PremiumCard";
 import PremiumButton from "../../src/components/PremiumButton";
 import { useCart } from "../../src/store/CartContext";
+import { useUser } from "../../src/store/UserContext";
 import { orderService } from "../../src/services/orderService";
 
 const paymentMethods = [
@@ -30,6 +31,7 @@ const paymentMethods = [
 export default function CartScreen() {
   const router = useRouter();
   const { items, total, removeItem, updateQuantity, clearCart } = useCart();
+  const { user } = useUser();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -46,7 +48,8 @@ export default function CartScreen() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Create the order
-    const order = await orderService.createOrder(items);
+    const userId = user?.phone || user?.id || "guest";
+    const order = await orderService.createOrder(items, userId);
 
     setIsProcessing(false);
     setShowPaymentModal(false);

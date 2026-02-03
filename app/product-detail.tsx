@@ -18,6 +18,7 @@ import { Typography } from "../src/constants/fonts";
 import PremiumButton from "../src/components/PremiumButton";
 import PremiumCard from "../src/components/PremiumCard";
 import { useCart } from "../src/store/CartContext";
+import { useUser } from "../src/store/UserContext";
 import { MenuItem, CartItem } from "../src/services/types";
 import { MOCK_MENU_ITEMS } from "../src/services/types";
 import { orderService } from "../src/services/orderService";
@@ -26,6 +27,7 @@ export default function ProductDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { addItem } = useCart();
+  const { user } = useUser();
   
   const product = MOCK_MENU_ITEMS.find((item) => item.id === id);
   const [quantity, setQuantity] = useState(1);
@@ -62,7 +64,8 @@ export default function ProductDetailScreen() {
 
     // Create the order
     const cartItems: CartItem[] = [{ ...product, quantity }];
-    const order = await orderService.createOrder(cartItems);
+    const userId = user?.phone || user?.id || "guest";
+    const order = await orderService.createOrder(cartItems, userId);
 
     setIsProcessing(false);
     setShowPaymentModal(false);
