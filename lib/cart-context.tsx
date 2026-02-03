@@ -1,0 +1,80 @@
+"use client"
+
+import React, { createContext, useContext, useState, useCallback } from "react"
+
+export interface MenuItem {
+  id: string
+  name: string
+  description: string
+  price: number
+  category: string
+  image?: string
+  rating: number
+  reviews: number
+  time?: string
+}
+
+export interface CartItem extends MenuItem {
+  quantity: number
+}
+
+interface CartContextType {
+  items: CartItem[]
+  total: number
+  addItem: (item: MenuItem, quantity?: number) => void
+  removeItem: (itemId: string) => void
+  updateQuantity: (itemId: string, quantity: number) => void
+  clearCart: () => void
+}
+
+const CartContext = createContext<CartContextType | undefined>(undefined)
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [items, setItems] = useState<CartItem[]>([])
+
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  const addItem = useCallback((item: MenuItem, quantity: number = 1) => {
+    setItems((prevItems) => {
+      const existingItem = prevItems.find((i) => i.id === item.id)
+      if (existingItem) {
+        return prevItems.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i
+        )
+      }
+      return [...prevItems, { ...item, quantity }]
+    })
+  }, [])
+
+  const removeItem = useCallback((itemId: string) => {
+    setItems((prevItems) => prevItems.filter((i) => i.id !== itemId))
+  }, [])
+
+  const updateQuantity = useCallback((itemId: string, quantity: number) => {
+    setItems((prevItems) =>
+      quantity <= 0
+        ? prevItems.filter((i) => i.id !== itemId)
+        : prevItems.map((i) => (i.id === itemId ? { ...i, quantity } : i))
+    )
+  }, [])
+
+  const clearCart = useCallback(() => {
+    setItems([])
+  }, [])
+
+  return (
+    <CartContext.Provider
+      value={{ items, total, addItem, removeItem, updateQuantity, clearCart }}
+    >
+      {children}
+    </CartContext.Provider>
+  )
+}
+
+export function useCart() {
+  const context = useContext(CartContext)
+  if (!context) {
+    throw new Error("useCart must be used within CartProvider")
+  }
+  return context
+}
