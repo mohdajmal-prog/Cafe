@@ -142,8 +142,8 @@ const MENU_ITEMS: MenuItem[] = [
 ]
 
 const CATEGORIES = [
-  { id: "1", name: "Drinks", icon: "🧃" },
-  { id: "2", name: "Snacks", icon: "🍪" },
+  { id: "1", name: "Drinks", icon: "☕" },
+  { id: "2", name: "Snacks", icon: "🥐" },
   { id: "3", name: "Desserts", icon: "🍰" },
   { id: "4", name: "Cakes", icon: "🎂" },
 ]
@@ -393,7 +393,7 @@ export default function CafePage() {
             </>
           ) : (
             <div className="py-12 text-center">
-              <div className="text-6xl">🛒</div>
+              <div className="text-6xl">���</div>
               <h3 className="mt-4 text-lg font-semibold">Your cart is empty</h3>
               <p className="mt-2 text-sm text-muted-foreground">Add delicious items from our menu</p>
             </div>
