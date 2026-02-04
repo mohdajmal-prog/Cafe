@@ -191,8 +191,7 @@ export default function CartScreen() {
             title={`Checkout • ₹${total}`}
             onPress={handleCheckout}
             size="sm"
-            fullWidth
-            style={{ marginLeft: Spacing.md, flex: 1 }}
+            style={{ marginLeft: Spacing.md }}
           />
         </View>
       )}
@@ -267,5 +266,92 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.lg,
+  },
+  closeButton: {
+    marginRight: Spacing.md,
+    padding: Spacing.xs,
+  },
+  modalScrollView: {
+    flex: 1,
+  },
+  modalSummaryCard: {
+    marginHorizontal: Spacing.lg,
+    marginVertical: Spacing.lg,
+  },
+  modalItemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.sm,
+  },
+  modalPaymentSection: {
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+  },
+  modalPaymentMethods: {
+    gap: Spacing.md,
+  },
+  modalPaymentMethodCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: Colors.card,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...Shadows.sm,
+  },
+  modalSelectedPaymentCard: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + "10",
+  },
+  modalPaymentMethodLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  modalPaymentIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: BorderRadius.md,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: Spacing.md,
+  },
+  modalPaymentInfo: {
+    flex: 1,
+  },
+  modalRadioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalRadioButtonSelected: {
+    borderColor: Colors.primary,
+  },
+  modalRadioButtonInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.primary,
+  },
+  modalFooter: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
   },
 });

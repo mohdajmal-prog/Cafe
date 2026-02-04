@@ -1,22 +1,13 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-} from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput } from "react-native";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../src/constants/colors";
-import { Spacing, BorderRadius, Shadows } from "../src/constants/spacing";
+import { Spacing, BorderRadius } from "../src/constants/spacing";
 import { Typography } from "../src/constants/fonts";
 import PremiumButton from "../src/components/PremiumButton";
 import { useUser } from "../src/store/UserContext";
 import { User } from "../src/services/types";
+import { api } from "../src/services/api";
 
 type RegistrationStep = "phone" | "otp" | "details";
 
@@ -29,7 +20,6 @@ export default function RegisterScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const isStep2Active = step === "otp" || step === "details";
 
   const handleSendOTP = async () => {
     if (phoneNumber.length < 10) {
@@ -37,10 +27,15 @@ export default function RegisterScreen() {
       return;
     }
     setIsLoading(true);
-    // Simulate OTP sending
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    setStep("otp");
+    try {
+      await api.sendOTP(`+91${phoneNumber}`);
+      setStep("otp");
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("Failed to send OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerifyOTP = async () => {
@@ -49,10 +44,15 @@ export default function RegisterScreen() {
       return;
     }
     setIsLoading(true);
-    // Simulate OTP verification
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    setStep("details");
+    try {
+      await api.verifyOTP(`+91${phoneNumber}`, otp);
+      setStep("details");
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      alert("Invalid OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCompleteRegistration = async () => {
@@ -61,10 +61,8 @@ export default function RegisterScreen() {
       return;
     }
     setIsLoading(true);
-    // Simulate registration completion
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsLoading(false);
-    // Set user in context
     const newUser: User = {
       id: `user_${Date.now()}`,
       name: name.trim(),
@@ -72,76 +70,58 @@ export default function RegisterScreen() {
       phone: `+91${phoneNumber}`,
     };
     setUser(newUser);
-    // Navigate to home
     router.replace("/(tabs)");
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.View entering={FadeInDown.duration(600)} style={styles.headerSection}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerSection}>
           <View style={styles.logoContainer}>
             <Text style={styles.logo}>☕</Text>
           </View>
           <Text style={[Typography.h2, { color: Colors.textPrimary, textAlign: "center" }]}>
-            Ambis Cafe
+            Afridh Cafe
           </Text>
-          <Text
-            style={[
-              Typography.bodySmall,
-              { color: Colors.textSecondary, textAlign: "center", marginTop: Spacing.sm },
-            ]}
-          >
+          <Text style={[Typography.bodySmall, { color: Colors.textSecondary, textAlign: "center", marginTop: Spacing.sm }]}>
             Welcome! Let's get you started
           </Text>
-        </Animated.View>
+        </View>
 
-        {/* Step Indicators */}
-        <Animated.View entering={FadeInDown.delay(100).duration(600)} style={styles.stepsContainer}>
-          <View style={[styles.stepIndicator, step !== "phone" && styles.stepComplete]}>
-            <Text style={styles.stepNumber}>1</Text>
-          </View>
-          <View style={styles.stepLine} />
-          <View
-            style={[
-              styles.stepIndicator,
-              step === "details" ? styles.stepComplete : step === "otp" ? styles.stepActive : undefined,
-            ]}
-          >
-            <Text style={styles.stepNumber}>2</Text>
-          </View>
-          <View style={styles.stepLine} />
-          <View style={[styles.stepIndicator, step === "details" && styles.stepComplete]}>
-            <Text style={styles.stepNumber}>3</Text>
-          </View>
-        </Animated.View>
+        <View style={styles.stepsContainer}>
+          {[1, 2, 3].map((num) => (
+            <View key={num} style={styles.stepWrapper}>
+              <View style={[
+                styles.stepIndicator,
+                step === "details" || (step === "otp" && num <= 2) || (step === "phone" && num === 1) ? styles.stepComplete : undefined
+              ]}>
+                <Text style={styles.stepNumber}>{num}</Text>
+              </View>
+              {num < 3 && <View style={styles.stepLine} />}
+            </View>
+          ))}
+        </View>
 
-        {/* Phone Input Step */}
         {step === "phone" && (
-          <Animated.View entering={FadeInDown.delay(200).duration(600)} style={styles.formSection}>
+          <View style={styles.formSection}>
             <Text style={[Typography.h4, { color: Colors.textPrimary, marginBottom: Spacing.lg }]}>
               Enter Your Phone Number
             </Text>
-            <View style={styles.inputGroup}>
-              <View style={styles.phoneInputContainer}>
-                <Text style={styles.countryCode}>🇮🇳 +91</Text>
-                <TextInput
-                  placeholder="Enter 10-digit number"
-                  placeholderTextColor={Colors.textSecondary}
-                  value={phoneNumber}
-                  onChangeText={setPhoneNumber}
-                  keyboardType="phone-pad"
-                  style={styles.phoneInput}
-                  maxLength={10}
-                />
-              </View>
-              <Text style={[Typography.caption, { color: Colors.textSecondary, marginTop: Spacing.md }]}>
-                We'll send you an OTP to verify your number
-              </Text>
+            <View style={styles.phoneInputContainer}>
+              <Text style={styles.countryCode}>🇮🇳 +91</Text>
+              <TextInput
+                placeholder="Enter 10-digit number"
+                placeholderTextColor={Colors.textSecondary}
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                keyboardType="phone-pad"
+                style={styles.phoneInput}
+                maxLength={10}
+              />
             </View>
+            <Text style={[Typography.caption, { color: Colors.textSecondary, marginTop: Spacing.md }]}>
+              We'll send you an OTP to verify your number
+            </Text>
 
             <PremiumButton
               title={isLoading ? "Sending OTP..." : "Send OTP"}
@@ -163,12 +143,11 @@ export default function RegisterScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
-          </Animated.View>
+          </View>
         )}
 
-        {/* OTP Input Step */}
         {step === "otp" && (
-          <Animated.View entering={FadeInDown.delay(200).duration(600)} style={styles.formSection}>
+          <View style={styles.formSection}>
             <Text style={[Typography.h4, { color: Colors.textPrimary, marginBottom: Spacing.lg }]}>
               Enter OTP
             </Text>
@@ -176,22 +155,17 @@ export default function RegisterScreen() {
               We've sent a 4-digit OTP to +91 {phoneNumber}
             </Text>
 
-            <View style={styles.otpContainer}>
-              <TextInput
-                placeholder="0000"
-                placeholderTextColor={Colors.textSecondary}
-                value={otp}
-                onChangeText={setOtp}
-                keyboardType="number-pad"
-                style={styles.otpInput}
-                maxLength={4}
-              />
-            </View>
+            <TextInput
+              placeholder="0000"
+              placeholderTextColor={Colors.textSecondary}
+              value={otp}
+              onChangeText={setOtp}
+              keyboardType="number-pad"
+              style={styles.otpInput}
+              maxLength={4}
+            />
 
-            <TouchableOpacity
-              onPress={() => setStep("phone")}
-              style={styles.resendContainer}
-            >
+            <TouchableOpacity onPress={() => setStep("phone")} style={styles.resendContainer}>
               <Text style={[Typography.caption, { color: Colors.primary }]}>
                 Didn't receive? Change Number
               </Text>
@@ -206,12 +180,11 @@ export default function RegisterScreen() {
               disabled={isLoading || otp.length < 4}
               style={{ marginTop: Spacing.xl }}
             />
-          </Animated.View>
+          </View>
         )}
 
-        {/* Details Step */}
         {step === "details" && (
-          <Animated.View entering={FadeInDown.delay(200).duration(600)} style={styles.formSection}>
+          <View style={styles.formSection}>
             <Text style={[Typography.h4, { color: Colors.textPrimary, marginBottom: Spacing.lg }]}>
               Complete Your Profile
             </Text>
@@ -263,7 +236,7 @@ export default function RegisterScreen() {
               disabled={isLoading || !name.trim() || !email.trim()}
               style={{ marginTop: Spacing.xl }}
             />
-          </Animated.View>
+          </View>
         )}
       </ScrollView>
     </View>
@@ -302,6 +275,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: Spacing.xl * 2,
   },
+  stepWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   stepIndicator: {
     width: 40,
     height: 40,
@@ -311,10 +288,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: Colors.border,
-  },
-  stepActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
   },
   stepComplete: {
     backgroundColor: Colors.primary + "20",
@@ -367,9 +340,6 @@ const styles = StyleSheet.create({
     height: 50,
     color: Colors.textPrimary,
     fontSize: 14,
-  },
-  otpContainer: {
-    marginBottom: Spacing.lg,
   },
   otpInput: {
     backgroundColor: Colors.card,

@@ -17,10 +17,16 @@ export default function HomeScreen() {
   const { items, loading } = useMenuItems();
   const { categories, loading: categoriesLoading } = useCategories();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredItems = selectedCategory
-    ? items.filter((item) => item.category === selectedCategory)
-    : items;
+  const filteredItems = items.filter((item) => {
+    const matchesCategory = selectedCategory ? item.category === selectedCategory : true;
+    const matchesSearch = searchQuery
+      ? item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    return matchesCategory && matchesSearch;
+  });
 
   const renderCategory = ({ item, index }: { item: Category; index: number }) => (
     <CategoryChip
@@ -41,7 +47,10 @@ export default function HomeScreen() {
         style={styles.scrollView}
       >
         <LuxuryHeader />
-        <SearchBar />
+        <SearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
 
 
         {/* Popular Items */}

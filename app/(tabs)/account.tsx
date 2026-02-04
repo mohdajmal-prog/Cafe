@@ -80,7 +80,7 @@ export default function AccountScreen() {
   const menuItems = [
     { icon: "person", label: "Edit Profile", onPress: () => handleMenuItemPress("Edit Profile") },
     { icon: "card", label: "Payment Methods", onPress: () => handleMenuItemPress("Payment Methods") },
-    { icon: "star", label: "My Rewards", onPress: () => handleMenuItemPress("My Rewards") },
+    { icon: "cash", label: "My Refund", onPress: () => handleMenuItemPress("My Refund") },
     { icon: "gift", label: "Offers & Promos", onPress: () => handleMenuItemPress("Offers & Promos") },
     { icon: "help-circle", label: "Help & Support", onPress: () => handleMenuItemPress("Help & Support") },
     { icon: "information-circle", label: "About", onPress: () => handleMenuItemPress("About") },
@@ -153,12 +153,6 @@ export default function AccountScreen() {
               Total Orders
             </Text>
             <Text style={[Typography.h2, { color: Colors.primary }]}>12</Text>
-          </PremiumCard>
-          <PremiumCard style={styles.statCard} delay={200}>
-            <Text style={[Typography.caption, { color: Colors.textSecondary }]}>
-              Loyalty Points
-            </Text>
-            <Text style={[Typography.h2, { color: Colors.primary }]}>450</Text>
           </PremiumCard>
         </View>
 

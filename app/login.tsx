@@ -15,6 +15,7 @@ import { Typography } from "../src/constants/fonts";
 import PremiumButton from "../src/components/PremiumButton";
 import { useUser } from "../src/store/UserContext";
 import { MOCK_USER } from "../src/services/types";
+import { api } from "../src/services/api";
 
 type LoginStep = "phone" | "otp";
 
@@ -32,9 +33,15 @@ export default function LoginScreen() {
       return;
     }
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    setStep("otp");
+    try {
+      await api.sendOTP(`+91${phoneNumber}`);
+      setStep("otp");
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("Failed to send OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerifyOTP = async () => {
@@ -43,11 +50,17 @@ export default function LoginScreen() {
       return;
     }
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // Set user in context
-    setUser(MOCK_USER);
-    router.replace("/(tabs)");
+    try {
+      const response = await api.verifyOTP(`+91${phoneNumber}`, otp);
+      // Assuming the response contains user data
+      setUser(response.user || MOCK_USER);
+      router.replace("/(tabs)");
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      alert("Invalid OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -61,7 +74,7 @@ export default function LoginScreen() {
             <Text style={styles.logo}>☕</Text>
           </View>
           <Text style={[Typography.h2, { color: Colors.textPrimary, textAlign: "center" }]}>
-            Cafe
+            Akbar Cafe
           </Text>
           <Text
             style={[

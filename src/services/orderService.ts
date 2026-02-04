@@ -2,7 +2,7 @@ import { Order, MOCK_ORDERS, MOCK_MENU_ITEMS, CartItem } from "./types";
 import { MOCK_DELAY } from "../constants/api";
 
 // In-memory storage for user orders (in a real app, this would be a database)
-let userOrders: Order[] = [...MOCK_ORDERS];
+let userOrders: Order[] = [];
 
 export const orderService = {
   // Get all orders (user orders + mock orders for demo)
